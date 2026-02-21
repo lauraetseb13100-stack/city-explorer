@@ -5,7 +5,7 @@ st.set_page_config(page_title="City Explorer")
 st.title("📍 City Explorer")
 
 # Colle ta nouvelle clé ici
-API_KEY = "AIzaSyBpOPKmsy71csnVyCKwMww0YrnicdoXXCo" 
+API_KEY = "AIzaSyA5PJn70aruuCJxgHWAIEbSiHvhW0rbVOY" 
 
 genai.configure(api_key=API_KEY)
 
