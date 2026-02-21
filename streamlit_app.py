@@ -9,7 +9,8 @@ st.subheader("Ton agrégateur d'événements locaux")
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('models/gemini-2.5-flash')
+    # On utilise 1.5 Flash qui est plus stable pour les quotas que la version 2.5
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
     st.error("Clé API non configurée.")
     st.stop()
@@ -36,21 +37,30 @@ if st.button("Lancer la recherche globale"):
         CONSIGNES :
         1. Organise par GRANDS TITRES (ex: VIDE-GRENIERS).
         2. Liste à puces : • [Nom] : [Lieu] - [Horaire] (Source : [Nom])
-        3. SI TU NE TROUVES RIEN, réponds exactement et uniquement par ce mot : RIEN
-        4. AUCUNE phrase d'introduction ni de conclusion.
+        3. SI AUCUN ÉVÉNEMENT : réponds uniquement 'RIEN'.
+        4. AUCUNE introduction.
         """
         
         try:
             response = model.generate_content(prompt)
-            resultat = response.text.strip()
             
-            st.markdown("---")
-            
-            # Vérification si l'IA n'a rien trouvé
-            if not resultat or "RIEN" in resultat.upper() and len(resultat) < 10:
-                st.info("Pas d'événement ce jour")
+            # Vérification si la réponse a été bloquée par les filtres
+            if not response.candidates:
+                st.warning("La recherche a été bloquée par les filtres de sécurité de Google. Essaie une autre ville.")
             else:
-                st.markdown(resultat)
+                resultat = response.text.strip()
+                st.markdown("---")
+                
+                if not resultat or "RIEN" in resultat.upper() and len(resultat) < 10:
+                    st.info("Pas d'événement ce jour")
+                else:
+                    st.markdown(resultat)
+                
+        except Exception as e:
+            if "429" in str(e):
+                st.error("Trop de recherches en peu de temps. Attends 1 minute.")
+            else:
+                st.error(f"Détail technique : {e}")
                 
         except Exception as e:
             # On garde l'erreur rouge uniquement si c'est une panne technique (ex: clé API)
