@@ -6,8 +6,7 @@ st.set_page_config(page_title="City Explorer", layout="wide")
 st.title("📍 City Explorer")
 st.subheader("Trouvez les vide-greniers et brocantes avec l'IA")
 
-# Ta clé API qui fonctionne
-API_KEY = "AIzaSyA5PJn70aruuCJxgHWAIEbSiHvhW0rbVOY" 
+API_KEY = st.secrets["GEMINI_API_KEY"]
 
 genai.configure(api_key=API_KEY)
 
