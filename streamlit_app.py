@@ -10,7 +10,7 @@ st.title("📍 City Explorer")
 # --- TA CLÉ ICI ---
 API_KEY = "AIzaSyABoY4UuLdz3La0vS4yHed6qJm3M7x5QDY"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash', tools=[{"google_search": {}}])
+model = genai.GenerativeModel('gemini-1.5-flash', tools=['google_search_retrieval'])
 
 ville = st.text_input("Quelle ville ?", "Marseille")
 date_choisie = st.date_input("Pour quelle date ?")
