@@ -38,7 +38,3 @@ if st.button("Lancer la recherche"):
             st.success("Recherche terminée !")
         except Exception as e:
             st.error(f"Erreur : {e}")
-        st.error("Ta clé est connectée mais aucun modèle n'est disponible.")
-
-except Exception as e:
-    st.error(f"L'erreur vient de là : {e}")
