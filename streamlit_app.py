@@ -1,27 +1,41 @@
 import streamlit as st
 import google.generativeai as genai
-import pandas as pd
-import folium
-from streamlit_folium import st_folium
 
 st.set_page_config(page_title="City Explorer", layout="wide")
-st.title("📍 City Explorer")
 
-# --- TA CLÉ ICI ---
+st.title("📍 City Explorer")
+st.subheader("Trouvez vos sorties en un clic")
+
 API_KEY = "AIzaSyABoY4UuLdz3La0vS4yHed6qJm3M7x5QDY"
+
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel(
-    model_name='models/gemini-1.5-flash',
-    tools=[{"google_search_retrieval": {}}]
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+col1, col2 = st.columns(2)
+with col1:
+    ville = st.text_input("Quelle ville ?", "Marseille")
+with col2:
+    date_choisie = st.date_input("Pour quelle date ?")
+
+categories = st.multiselect(
+    "Que cherchez-vous ?",
+    ["Vide-greniers", "Brocantes", "Marchés locaux", "Recycleries", "Escape Games"],
+    default=["Vide-greniers"]
 )
 
-ville = st.text_input("Quelle ville ?", "Marseille")
-date_choisie = st.date_input("Pour quelle date ?")
-categories = st.multiselect("Catégories", ["Vide-greniers", "Brocantes", "Marchés", "Recycleries"], default=["Vide-greniers"])
-
-if st.button("Rechercher"):
-    with st.spinner("L'IA cherche sur Google..."):
-        prompt = f"Donne les {categories} à {ville} le {date_choisie}. Format: Nom | Adresse | Ville | Lat | Lon"
-        response = model.generate_content(prompt)
-        st.write(response.text)
-        st.info("Bravo ! Ton app est connectée à l'IA.")
+if st.button("Lancer la recherche"):
+    with st.spinner(f"Recherche en cours pour {ville}..."):
+        prompt = f"""
+        En tant qu'expert local, liste les événements et lieux suivants : {categories} 
+        à {ville} pour la date du {date_choisie}.
+        Donne pour chaque résultat : le nom, l'adresse précise et une courte description.
+        Si tu ne trouves pas d'événement spécifique à cette date, propose les lieux permanents 
+        (comme les recycleries ou les marchés hebdomadaires).
+        """
+        
+        try:
+            response = model.generate_content(prompt)
+            st.markdown("---")
+            st.markdown(response.text)
+        except Exception as e:
+            st.error(f"Erreur de connexion : {e}")
