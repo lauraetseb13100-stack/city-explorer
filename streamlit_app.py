@@ -10,7 +10,7 @@ try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=API_KEY)
     # On utilise 1.5 Flash qui est plus stable pour les quotas que la version 2.5
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 except Exception as e:
     st.error("Clé API non configurée.")
     st.stop()
