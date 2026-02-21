@@ -11,7 +11,7 @@ st.title("📍 City Explorer")
 API_KEY = "AIzaSyABoY4UuLdz3La0vS4yHed6qJm3M7x5QDY"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel(
-    model_name='gemini-1.5-flash',
+    model_name='models/gemini-1.5-flash',
     tools=[{"google_search_retrieval": {}}]
 )
 
