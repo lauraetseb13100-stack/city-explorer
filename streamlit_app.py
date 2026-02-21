@@ -8,7 +8,7 @@ st.set_page_config(page_title="City Explorer", layout="wide")
 st.title("📍 City Explorer")
 
 # --- TA CLÉ ICI ---
-API_KEY = "TA_CLE_API_ICI" # <--- METS TA CLÉ ENTRE LES GUILLEMETS
+API_KEY = "AIzaSyABoY4UuLdz3La0vS4yHed6qJm3M7x5QDY"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash', tools=[{"google_search": {}}])
 
