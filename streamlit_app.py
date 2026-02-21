@@ -4,14 +4,14 @@ import google.generativeai as genai
 st.set_page_config(page_title="City Explorer", layout="wide")
 
 st.title("📍 City Explorer")
-st.subheader("Agrégateur d'événements locaux en temps réel")
+st.subheader("Ton agrégateur d'événements locaux")
 
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel('models/gemini-2.5-flash')
 except Exception as e:
-    st.error("Clé API non configurée.")
+    st.error("Clé API non configurée dans les Secrets.")
     st.stop()
 
 col1, col2 = st.columns(2)
@@ -22,40 +22,31 @@ with col2:
 
 categories = st.multiselect(
     "Types d'événements",
-    ["Vide-greniers", "Brocantes", "Marchés", "Fêtes de village", "Salons", "Expositions"],
+    ["Vide-greniers", "Brocantes", "Marchés", "Fêtes de village"],
     default=["Vide-greniers", "Brocantes", "Marchés"]
 )
 
 if st.button("Lancer la recherche globale"):
-    with st.spinner(f"Scan des sources (Mairies, Vide-greniers.org, Jours-de-marché, Agendas locaux)..."):
+    with st.spinner(f"Scan des sources en cours..."):
         
+        # PROMPT AVEC MISE EN PAGE STRUCTURÉE
         prompt = f"""
-        Tu es un agent de recherche ultra-performant. Nous sommes le 21 février 2026.
-        Ta mission : Synthétiser les données de plusieurs sources pour {ville} le {date_choisie}.
+        Aujourd'hui nous sommes le 21 février 2026. 
+        Recherche les {categories} à {ville} le {date_choisie}.
         
-        SOURCES À CONSULTER (via ta base de données) :
-        1. Vide-greniers.org & Brocabrac (pour les ventes entre particuliers).
-        2. Jours-de-marché.fr (pour les marchés alimentaires et artisanaux).
-        3. Agendas municipaux et sites des mairies (pour les fêtes de village et événements officiels).
-        4. France-Brocante (pour les professionnels).
-        
-        CONSIGNES DE RÉPONSE :
-        - AUCUNE introduction, AUCUNE conclusion.
-        - Uniquement des faits.
-        - Si plusieurs événements, sépare-les par une ligne '---'.
-        - Format strict :
-        
-        Événement : [Nom]
-        Type : [Catégorie]
-        Lieu : [Adresse précise]
-        Horaire : [Si disponible]
-        Source : [Nom de la source probable]
-        ---
+        CONSIGNES DE MISE EN PAGE :
+        1. Organise la réponse par GRANDS TITRES en majuscules pour chaque catégorie (ex: VIDE-GRENIERS, MARCHÉS).
+        2. Sous chaque titre, utilise une liste à puces (un point par événement).
+        3. Pour chaque point, respecte strictement ce format : 
+           • [Nom de l'événement] : [Adresse/Lieu] - [Horaire] (Source : [Nom])
+        4. Si une catégorie est vide, n'affiche pas le titre.
+        5. AUCUNE phrase d'introduction ni de conclusion. Direct au but.
         """
         
         try:
             response = model.generate_content(prompt)
-            st.markdown(f"### 📋 Résultats pour {ville}")
-            st.write(response.text)
+            st.markdown("---")
+            # Utilisation de st.markdown pour que les titres et les puces s'affichent bien
+            st.markdown(response.text)
         except Exception as e:
-            st.error(f"Erreur lors de la synthèse : {e}")
+            st.error(f"Erreur d'affichage : {e}")
